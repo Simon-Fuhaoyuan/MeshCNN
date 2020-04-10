@@ -106,6 +106,12 @@ def define_classifier(input_nc, ncf, ninput_edges, nclasses, opt, gpu_ids, arch,
         pool_res = [ninput_edges] + opt.pool_res
         net = MeshEncoderDecoder(pool_res, down_convs, up_convs, blocks=opt.resblocks,
                                  transfer_data=True)
+    elif arch == "meshunet_recon":
+        down_convs = [input_nc] + ncf
+        up_convs = ncf[::-1] + [input_nc]
+        pool_res = [ninput_edges] + opt.pool_res
+        net = MeshEncoderDecoder(pool_res, down_convs, up_convs, blocks=opt.resblocks,
+                                 transfer_data=True)
     else:
         raise NotImplementedError('Encoder model name [%s] is not recognized' % arch)
     return init_net(net, init_type, init_gain, gpu_ids)
@@ -115,6 +121,8 @@ def define_loss(opt):
         loss = torch.nn.CrossEntropyLoss()
     elif opt.dataset_mode == 'segmentation':
         loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
+    elif opt.dataset_mode == 'reconstruction':
+        loss = torch.nn.MSELoss(reduction='mean')
     return loss
 
 ##############################################################################

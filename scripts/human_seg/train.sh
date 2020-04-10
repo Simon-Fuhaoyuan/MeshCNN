@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ## run the training
-python train.py \
---dataroot datasets/human_seg \
+CUDA_VISIBLE_DEVICES=4 python train.py \
+--dataroot /disk5/data/MeshCNN/datasets/human_seg \
 --name human_seg \
 --arch meshunet \
 --dataset_mode segmentation \

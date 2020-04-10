@@ -24,6 +24,7 @@ class ClassifierModel:
         self.mesh = None
         self.soft_label = None
         self.loss = None
+        self.test_loss = None
 
         #
         self.nclasses = opt.nclasses
@@ -44,13 +45,18 @@ class ClassifierModel:
 
     def set_input(self, data):
         input_edge_features = torch.from_numpy(data['edge_features']).float()
-        labels = torch.from_numpy(data['label']).long()
+        if self.opt.dataset_mode == 'reconstruction':
+            labels = torch.from_numpy(data['label']).float()
+            self.test_loss = networks.define_loss(self.opt).to(self.device)
+        else:
+            labels = torch.from_numpy(data['label']).long()
         # set inputs
         self.edge_features = input_edge_features.to(self.device).requires_grad_(self.is_train)
         self.labels = labels.to(self.device)
         self.mesh = data['mesh']
         if self.opt.dataset_mode == 'segmentation' and not self.is_train:
             self.soft_label = torch.from_numpy(data['soft_label'])
+        # print(self.edge_features.shape) [bs, 5, 750]
 
 
     def forward(self):
@@ -108,6 +114,9 @@ class ClassifierModel:
         """
         with torch.no_grad():
             out = self.forward()
+            if self.opt.dataset_mode == 'reconstruction':
+                test_loss = self.test_loss(out, self.labels).cpu().numpy()
+                return test_loss
             # compute number of correct
             pred_class = out.data.max(1)[1]
             label_class = self.labels

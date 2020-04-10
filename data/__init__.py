@@ -10,6 +10,9 @@ def CreateDataset(opt):
     elif opt.dataset_mode == 'classification':
         from data.classification_data import ClassificationData
         dataset = ClassificationData(opt)
+    elif opt.dataset_mode == 'reconstruction':
+        from data.reconstruction_data import ReconstructionData
+        dataset = ReconstructionData(opt)
     return dataset
 
 

@@ -18,11 +18,16 @@ class MeshConv(nn.Module):
         return self.forward(edge_f, mesh)
 
     def forward(self, x, mesh):
+        # print(x.shape)
         x = x.squeeze(-1)
+        # print(x.shape) # [bs, channel, resolution]
         G = torch.cat([self.pad_gemm(i, x.shape[2], x.device) for i in mesh], 0)
         # build 'neighborhood image' and apply convolution
+        # print(G.shape)
         G = self.create_GeMM(x, G)
+        # print(G.shape) [bs, channel, resolution, 5], 5 for itself and neighbour
         x = self.conv(G)
+        # print(x.shape)
         return x
 
     def flatten_gemm_inds(self, Gi):
@@ -43,6 +48,7 @@ class MeshConv(nn.Module):
         output dimensions: Batch x Channels x Edges x 5
         """
         Gishape = Gi.shape
+        # print(Gishape)
         # pad the first row of  every sample in batch with zeros
         padding = torch.zeros((x.shape[0], x.shape[1], 1), requires_grad=True, device=x.device)
         # padding = padding.to(x.device)

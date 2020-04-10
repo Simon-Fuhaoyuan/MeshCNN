@@ -62,6 +62,7 @@ def from_scratch(file, opt):
     mesh_data.features = extract_features(mesh_data)
     return mesh_data
 
+# get verticals and faces
 def fill_from_file(mesh, file):
     mesh.filename = ntpath.split(file)[1]
     mesh.fullfilename = file
@@ -86,7 +87,9 @@ def fill_from_file(mesh, file):
     assert np.logical_and(faces >= 0, faces < len(vs)).all()
     return vs, faces
 
-
+# obj file has a property: if edge (a,b) is used twice, then there must exist
+# two faces: the sequential of a and b is <a,b> in one, and <b,a> in another.
+# This function deletes the faces when using an edge for more than three times.
 def remove_non_manifolds(mesh, faces):
     mesh.ve = [[] for _ in mesh.vs]
     edges_set = set()

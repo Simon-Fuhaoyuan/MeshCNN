@@ -2,8 +2,8 @@
 
 ## run the training
 python train.py \
---dataroot /disk5/data/MeshCNN/datasets/shrec_16 \
---name shrec16 \
+--dataroot /disk5/data/MeshCNN/datasets/debug \
+--name debug \
 --ncf 64 128 256 256 \
 --pool_res 600 450 300 180 \
 --norm group \
